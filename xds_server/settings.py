@@ -12,8 +12,14 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# add the parent directory to PYTHONPATH to have access to external apps
+APP_PATH = os.path.join(BASE_DIR, '..')
+if APP_PATH not in sys.path:
+    sys.path.insert(0, APP_PATH)
 
 
 # Quick-start development settings - unsuitable for production
@@ -37,6 +43,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'xds-server-apps.xds-bookmarks'
 )
 
 MIDDLEWARE_CLASSES = (
