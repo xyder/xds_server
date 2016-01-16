@@ -43,7 +43,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'xds-server-apps.xds-bookmarks'
+    'xds_server_apps.xds_bookmarks',
+    'xds_server_apps.xds_notes'
 )
 
 MIDDLEWARE_CLASSES = (
