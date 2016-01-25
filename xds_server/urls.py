@@ -18,4 +18,6 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^bookmarks/', include('xds_server_apps.xds_bookmarks.urls')),
+    url(r'^', include('main_interface.urls'))
 ]
