@@ -1,3 +1,5 @@
 .idea/
 *.py[co]
 *.sqlite[3]
+
+activate_env.bat

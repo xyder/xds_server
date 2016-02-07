@@ -1,10 +1,19 @@
-#!/usr/bin/env python
-import os
-import sys
+from xds_server.core import initialize, app
 
-if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "xds_server.settings")
+from xds_server.core.database import db_session
 
-    from django.core.management import execute_from_command_line
 
-    execute_from_command_line(sys.argv)
+# noinspection PyUnusedLocal
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    """
+    Executes on each session end.
+    """
+
+    db_session.remove()
+
+if __name__ == '__main__':
+    # todo: add cli args, with overrides for debug and port
+    initialize()
+
+    app.run()
