@@ -1,5 +1,8 @@
-from xds_server.core import initialize, app
+# noinspection PyUnresolvedReferences
+# relative import of settings where the working directory is added to PYTHONPATH
+import server.settings
 
+from xds_server.core import initialize, app
 from xds_server.core.database import db_session
 
 
@@ -13,7 +16,6 @@ def shutdown_session(exception=None):
     db_session.remove()
 
 if __name__ == '__main__':
-    # todo: add cli args, with overrides for debug and port
     initialize()
 
     app.run()

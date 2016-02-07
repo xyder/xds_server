@@ -1,7 +1,14 @@
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import sys
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# add the parent directory to PYTHONPATH to have access to external apps
+APP_PATH = os.path.join(BASE_DIR, '..')
+if APP_PATH not in sys.path:
+    sys.path.insert(0, APP_PATH)
 
 # possible keys:
 #   module - (mandatory) represents the module used to fetch the routes and build the blueprint
