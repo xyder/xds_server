@@ -6,7 +6,7 @@ import sys
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # add the parent directory to PYTHONPATH to have access to external apps
-APP_PATH = os.path.join(BASE_DIR, '..')
+APP_PATH = os.path.normpath(os.path.join(BASE_DIR, '..'))
 if APP_PATH not in sys.path:
     sys.path.insert(0, APP_PATH)
 
@@ -26,6 +26,10 @@ INSTALLED_APPS = [
     {
         'module': 'xds_server_apps.xds_bookmarks',
         'prefix': '/bookmarks'
+    },
+    {
+        'module': 'xds_server_apps.xds_notes',
+        'prefix': '/notes'
     }
 ]
 
@@ -41,7 +45,7 @@ class BaseConfig(object):
     DEBUG = False
     TESTING = False
 
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///%s' % (os.path.join(BASE_DIR, 'data.sqlite'))
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///%s' % (os.path.join(BASE_DIR, 'data.sqlite3'))
 
     SERVER_HOST = '127.0.0.1'
     SERVER_PORT = 5000
