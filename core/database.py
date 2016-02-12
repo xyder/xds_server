@@ -1,9 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
-from xds_server.core.lib import import_models
+from core.lib import import_models
 
-from xds_server.server.settings import ACTIVE_CONFIG
+from server.settings import ACTIVE_CONFIG
 
 # the database engine
 engine = create_engine(ACTIVE_CONFIG.SQLALCHEMY_DATABASE_URI)

@@ -2,7 +2,7 @@ from functools import partial
 from importlib import import_module
 import logging
 from flask.ext.admin.contrib.sqla import ModelView
-from xds_server.server import settings
+from server import settings
 
 
 def try_import(module_name: str):
@@ -13,10 +13,12 @@ def try_import(module_name: str):
 
     try:
         return import_module(module_name)
-    except ImportError:
+    except ImportError as e:
+
         msg = ('Error importing module "%s".\n'
-               'The module might have errors or was not specified as "undefined" in the settings file.')
-        logging.warning(msg % module_name)
+               'The module might have errors or was not specified as "undefined" in the settings file.\n'
+               'Exception message: %s')
+        logging.warning(msg % (module_name, e.msg))
         return None
 
 
@@ -55,8 +57,8 @@ def create_admin_view(model, model_view=None):
     :param model_view: custom model view that can be used instead of ModelView
     """
 
-    from xds_server.core import admin
-    from xds_server.core.database import db_session
+    from core import admin
+    from core.database import db_session
 
     if not model_view:
         admin.add_view(ModelView(model, db_session))
@@ -83,3 +85,6 @@ def get_custom_prefixer(prefix):
     """
 
     return partial(apply_prefix, prefix=prefix)
+
+
+

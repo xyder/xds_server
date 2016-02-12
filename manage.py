@@ -2,8 +2,8 @@
 # relative import of settings where the working directory is added to PYTHONPATH
 import server.settings
 
-from xds_server.core import initialize, app
-from xds_server.core.database import db_session
+from core import initialize, app
+from core.database import db_session
 
 
 # noinspection PyUnusedLocal

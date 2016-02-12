@@ -1,7 +1,7 @@
 from importlib import import_module
 import itertools
 from flask import Blueprint
-from xds_server.core.lib import try_import
+from core.lib import try_import
 
 
 def apply_prefix(prefix: str, t: list) -> tuple:

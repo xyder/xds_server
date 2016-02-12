@@ -2,10 +2,10 @@ import logging
 from flask import Flask
 from flask.ext.admin import Admin
 
-from xds_server.core.database import init_db
-from xds_server.core.lib import import_admin_views
-from xds_server.server import settings
-from xds_server.tools.routing import register_blueprints
+from core.database import init_db
+from core.lib import import_admin_views
+from server import settings
+from tools.routing import register_blueprints
 
 
 # initialize and configure the flask server

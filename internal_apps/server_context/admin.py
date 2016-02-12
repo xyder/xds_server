@@ -1,7 +1,7 @@
 from flask.ext.admin.contrib.sqla import ModelView
 
-from xds_server.core.lib import create_admin_view
-from xds_server.internal_apps.server_context import models
+from core.lib import create_admin_view
+from internal_apps.server_context import models
 
 
 # noinspection PyAbstractClass

@@ -1,14 +1,19 @@
 import os
-
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import sys
+
+
+def add_path(path):
+    if path not in sys.path:
+        sys.path.insert(0, path)
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # add the parent directory to PYTHONPATH to have access to external apps
-APP_PATH = os.path.normpath(os.path.join(BASE_DIR, '..'))
-if APP_PATH not in sys.path:
-    sys.path.insert(0, APP_PATH)
+ROOT_PATH = os.path.normpath(os.path.join(BASE_DIR, '..'))
+EXT_APPS_PATH = os.path.join(ROOT_PATH, 'xds_server_apps')
+
+add_path(EXT_APPS_PATH)
 
 # possible keys:
 #   module - (mandatory) represents the module used to fetch the routes and build the blueprint
@@ -16,19 +21,19 @@ if APP_PATH not in sys.path:
 #   undefined - represents submodules which will be ignored on dynamic import
 INSTALLED_APPS = [
     {
-        'module': 'xds_server.internal_apps.main_interface',
+        'module': 'internal_apps.main_interface',
         'undefined': ['models', 'admin']
     },
     {
-        'module': 'xds_server.internal_apps.server_context',
+        'module': 'internal_apps.server_context',
         'undefined': ['urls']
     },
     {
-        'module': 'xds_server_apps.xds_bookmarks',
+        'module': 'xds_bookmarks',
         'prefix': '/bookmarks'
     },
     {
-        'module': 'xds_server_apps.xds_notes',
+        'module': 'xds_notes',
         'prefix': '/notes'
     }
 ]
