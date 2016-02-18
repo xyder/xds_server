@@ -1,3 +1,4 @@
+from functools import partial
 from importlib import import_module
 import itertools
 from flask import Blueprint
@@ -13,19 +14,7 @@ def apply_prefix(prefix: str, t: list) -> tuple:
     return '%s%s' % (prefix, t[0]), t[1]
 
 
-def apply_prefixes(prefix: str, routes: list) -> list:
-    """
-    Applies a prefix to a list of tuples.
-    :return: the modified list.
-    """
-
-    ret = []
-    for route in routes:
-        ret.append(apply_prefix(prefix, route))
-    return ret
-
-
-def url(route: str, **kwargs: dict) -> list:
+def url(route_url: str, **kwargs: dict) -> list:
     """
     Returns a list of tuples that contains the given route and any attached arguments.
     If 'include=module_name' is specified as keyword argument then it will include the submodule 'urlpatterns' from
@@ -38,11 +27,16 @@ def url(route: str, **kwargs: dict) -> list:
 
     ret = []
     if 'include' in kwargs:
-        # load module from arg, flatten urlpatterns list and apply prefixes
-        ret += apply_prefixes(route, itertools.chain(
-            *import_module(kwargs['include'].__name__ + '.urls').urlpatterns))
+        # get module patterns
+        module_patterns = import_module(kwargs['include'].__name__ + '.urls').urlpatterns
+
+        # create prefixer
+        prefixer = partial(apply_prefix, route_url)
+
+        # apply prefix to all routes
+        ret += list(map(prefixer, itertools.chain(*module_patterns)))
     else:
-        ret = [(route, kwargs)]
+        ret = [(route_url, kwargs)]
     return ret
 
 
@@ -86,6 +80,7 @@ def register_blueprints(app, installed_apps):
     """
 
     for iapp in installed_apps:
+        # skip if urls are specified as ignored
         if 'urls' in iapp.get('undefined', []):
             continue
 
