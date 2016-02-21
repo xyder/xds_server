@@ -2,7 +2,7 @@
 # relative import of settings where the working directory is added to PYTHONPATH
 import server.settings
 
-from core import initialize, app
+from core import initialize, app, socketio
 from core.database import db_session
 
 
@@ -18,4 +18,4 @@ def shutdown_session(exception=None):
 if __name__ == '__main__':
     initialize()
 
-    app.run()
+    socketio.run(app)

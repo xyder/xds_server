@@ -12,6 +12,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # add the parent directory to PYTHONPATH to have access to external apps
 ROOT_PATH = os.path.normpath(os.path.join(BASE_DIR, '..'))
 EXT_APPS_PATH = os.path.join(ROOT_PATH, 'xds_server_apps')
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
 add_path(EXT_APPS_PATH)
 
