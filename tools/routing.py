@@ -2,6 +2,7 @@ from functools import partial
 from importlib import import_module
 import itertools
 from flask import Blueprint
+
 from core.lib import try_import
 
 
@@ -40,37 +41,66 @@ def url(route_url: str, **kwargs: dict) -> list:
     return ret
 
 
-def add_routes(app, prefix: str='', routes: list=()) -> None:
+def add_routes(app, prefix: str='', routes: list=(), register_function: callable=None) -> None:
     """
     Registers the given routes to an app.
     :param prefix: a prefix that may be prepended to the all given routes.
     :param routes: a list of routes.
+    :param register_function: a function that is called using the aggregated prefix and the
+    parameters stored in the routes list
     """
 
     routes = routes or []
     routes = itertools.chain(*routes)
+    register_function = register_function or app.add_url_rule
 
     for route in routes:
         prefixed = apply_prefix(prefix, route)
-        app.add_url_rule(prefixed[0], **prefixed[1])
+        register_function(prefixed[0], **prefixed[1])
 
 
-def build_blueprint(data):
+def add_socket_rule(namespace: str='', event_name: str='', socket_func: callable=None) -> None:
+    """
+    Function that adds a socket rule to the socketio object.
+    :param namespace: The namespace on which the socket will be listening
+    :param event_name: The name of the event for which the view function will be called
+    :param socket_func: The view function registered to the event
+    """
+
+    from core import socketio
+
+    if not socket_func:
+        def socket_func(_): pass
+
+    socketio.on(event_name or '', namespace=namespace or '/')(socket_func)
+
+
+def build_blueprint(data: dict=()) -> Blueprint:
     """
     Function that builds a bluprint with the given data.
+    :return: a Flask Blueprint object
     """
-
-    urls_module = try_import('%s.urls' % data['module'])
-
-    if not urls_module:
-        return None
 
     bp = Blueprint(data['module'].split('.')[-1],
                    data['module'],
                    template_folder='templates',
                    static_folder='static')
 
-    add_routes(bp, routes=urls_module.urlpatterns)
+    urls_module = try_import('%s.urls' % data['module'])
+    if not urls_module:
+        return bp
+
+    # try registering sockets
+    try:
+        add_routes(bp, routes=urls_module.urlpatterns)
+    except AttributeError:
+        pass
+
+    #  try registering routes
+    try:
+        add_routes(bp, routes=urls_module.socketpatterns, register_function=add_socket_rule)
+    except AttributeError:
+        pass
     return bp
 
 
@@ -84,6 +114,4 @@ def register_blueprints(app, installed_apps):
         if 'urls' in iapp.get('undefined', []):
             continue
 
-        bp = build_blueprint(iapp)
-        if bp:
-            app.register_blueprint(bp, url_prefix=iapp.get('prefix', ''))
+        app.register_blueprint(build_blueprint(iapp), url_prefix=iapp.get('prefix', ''))
