@@ -15,33 +15,43 @@ def apply_prefix(prefix: str, t: list) -> tuple:
     return '%s%s' % (prefix, t[0]), t[1]
 
 
-def url(route_url: str, **kwargs: dict) -> list:
+def url(route_url: str = '', **kwargs: dict) -> list:
     """
-    Returns a list of tuples that contains the given route and any attached arguments.
-    If 'include=module_name' is specified as keyword argument then it will include the submodule 'urlpatterns' from
-    the specified module.
-    :param kwargs: The keyword arguments will be attached to the url tuple associated with the route.
-    'include' as a keyword argument can specify the name of a module for which the submodule 'urlpatterns' will be
-    loaded.
-    :return: A list of tuples for the specified route/routes
+    Generates a route/list of routes.
+    :param kwargs: Any argument except 'include' and 'routes' will be used to make a route with the
+    specified route_url
+    'include': can specify a module for which module.urlpatterns will be loaded as routes and prefixed
+    'routes': can specify a list of routes which will be loaded and prefixed
+    :return: The list of loaded and prefixed routes
     """
 
     ret = []
-    if 'include' in kwargs:
-        # get module patterns
-        module_patterns = import_module(kwargs['include'].__name__ + '.urls').urlpatterns
+    module = kwargs.pop('include', None)
+    routes = kwargs.pop('routes', [])
 
-        # create prefixer
-        prefixer = partial(apply_prefix, route_url)
+    # create prefixer
+    prefixer = partial(apply_prefix, route_url)
+
+    if module:
+        module_name = module if isinstance(module, str) else module.__name__
+
+        # get module patterns
+        module_patterns = import_module('%s.urls' % module_name).urlpatterns
 
         # apply prefix to all routes
         ret += list(map(prefixer, itertools.chain(*module_patterns)))
-    else:
-        ret = [(route_url, kwargs)]
+
+    if routes:
+        ret += list(map(prefixer, itertools.chain(*routes)))
+
+    # if there are arguments left, add as a new route directly on the route_url
+    if kwargs:
+        ret += [(route_url, kwargs)]
+
     return ret
 
 
-def add_routes(app, prefix: str='', routes: list=(), register_function: callable=None) -> None:
+def add_routes(app, prefix: str = '', routes: list = (), register_function: callable = None) -> None:
     """
     Registers the given routes to an app.
     :param prefix: a prefix that may be prepended to the all given routes.
@@ -59,7 +69,7 @@ def add_routes(app, prefix: str='', routes: list=(), register_function: callable
         register_function(prefixed[0], **prefixed[1])
 
 
-def add_socket_rule(namespace: str='', event_name: str='', socket_func: callable=None) -> None:
+def add_socket_rule(namespace: str = '', event_name: str = '', socket_func: callable = None) -> None:
     """
     Function that adds a socket rule to the socketio object.
     :param namespace: The namespace on which the socket will be listening
@@ -75,7 +85,7 @@ def add_socket_rule(namespace: str='', event_name: str='', socket_func: callable
     socketio.on(event_name or '', namespace=namespace or '/')(socket_func)
 
 
-def build_blueprint(data: dict=()) -> Blueprint:
+def build_blueprint(data: dict = ()) -> Blueprint:
     """
     Function that builds a bluprint with the given data.
     :return: a Flask Blueprint object
@@ -91,16 +101,13 @@ def build_blueprint(data: dict=()) -> Blueprint:
         return bp
 
     # try registering sockets
-    try:
-        add_routes(bp, routes=urls_module.urlpatterns)
-    except AttributeError:
-        pass
+    add_routes(bp, routes=getattr(urls_module, 'urlpatterns', []))
 
-    #  try registering routes
-    try:
-        add_routes(bp, routes=urls_module.socketpatterns, register_function=add_socket_rule)
-    except AttributeError:
-        pass
+    # try registering routes
+    add_routes(bp,
+               prefix=data.get('prefix', ''),
+               routes=getattr(urls_module, 'socketpatterns', []),
+               register_function=add_socket_rule)
     return bp
 
 
