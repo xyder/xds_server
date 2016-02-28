@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 
@@ -57,6 +58,8 @@ class BaseConfig(object):
     SERVER_PORT = 5000
     SERVER_NAME = ''
 
+    SERVER_LOGGER = 'xds_server'
+
     # set the secret key.  keep this really secret:
     SECRET_KEY = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
@@ -95,3 +98,7 @@ class TestingConfig(BaseConfig):
 
 # change this to run with different configs
 ACTIVE_CONFIG = DevelopmentConfig()
+
+
+def get_logger():
+    return logging.getLogger(ACTIVE_CONFIG.SERVER_LOGGER)

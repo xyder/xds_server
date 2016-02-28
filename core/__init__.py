@@ -13,11 +13,20 @@ from tools.routing import register_blueprints
 app = Flask(__name__, static_folder=settings.STATIC_DIR, static_url_path='/static')
 app.config.from_object(settings.ACTIVE_CONFIG)
 
-socketio = SocketIO(app)
+logger = logging.getLogger('xds_server')
 
-# set logger level for production
-if not app.debug and not app.testing:
-    logging.getLogger('wekzeug').setLevel(logging.WARNING)
+log_handler = logging.StreamHandler()
+log_formatter = logging.Formatter(fmt='%(asctime)s -- %(levelname)-9s: %(message)s ----- @[%(pathname)s:%(lineno)d]')
+log_formatter.default_time_format = '%y%m%d:%H%M%S'
+log_formatter.default_msec_format = '%s:%3d'
+log_handler.setFormatter(log_formatter)
+log_handler.setLevel(logging.DEBUG)
+
+logger.addHandler(log_handler)
+in_development = app.debug or app.testing
+logger.setLevel(logging.DEBUG if in_development else logging.INFO)
+
+socketio = SocketIO(app)
 
 # initialize the admin manager
 admin = Admin(app, name=settings.APP_NAME, template_mode='bootstrap3')
