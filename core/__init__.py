@@ -1,13 +1,13 @@
 import logging
+
 from flask import Flask
 from flask.ext.admin import Admin
 from flask.ext.socketio import SocketIO
 
 from core.database import init_db
 from core.lib import import_admin_views
+from core.routing import register_blueprints
 from server import settings
-from tools.routing import register_blueprints
-
 
 # initialize and configure the flask server
 app = Flask(__name__, static_folder=settings.STATIC_DIR, static_url_path='/static')
