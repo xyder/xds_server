@@ -91,10 +91,13 @@ def build_blueprint(data: dict = ()) -> Blueprint:
     :return: a Flask Blueprint object
     """
 
-    bp = Blueprint(data['module'].split('.')[-1],
+    module_name = data['module'].split('.')[-1]
+
+    bp = Blueprint(module_name,
                    data['module'],
                    template_folder='templates',
-                   static_folder='static')
+                   static_folder='static',
+                   static_url_path='/static')
 
     urls_module = try_import('%s.urls' % data['module'])
     if not urls_module:

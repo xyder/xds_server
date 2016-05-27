@@ -10,7 +10,8 @@ from core.routing import register_blueprints
 from server import settings
 
 # initialize and configure the flask server
-app = Flask(__name__, static_folder=settings.STATIC_DIR, static_url_path='/static')
+# static urls must be unique
+app = Flask(__name__, static_folder=settings.STATIC_DIR, static_url_path='/main_static')
 app.config.from_object(settings.ACTIVE_CONFIG)
 
 logger = logging.getLogger('xds_server')
