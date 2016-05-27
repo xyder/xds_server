@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Text
 from core.database import Base
 from core.lib import get_custom_prefixer
-from internal_apps.server_context import APP_NAME
+from . import APP_NAME
 
 prefixer = get_custom_prefixer(APP_NAME)
 

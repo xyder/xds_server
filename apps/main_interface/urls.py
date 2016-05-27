@@ -1,5 +1,5 @@
 from core.routing import url
-from internal_apps.main_interface import views
+from . import views
 
 urlpatterns = [
     url('/', view_func=views.index),

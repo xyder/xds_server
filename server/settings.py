@@ -12,7 +12,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # add the parent directory to PYTHONPATH to have access to external apps
 ROOT_PATH = os.path.normpath(os.path.join(BASE_DIR, '..'))
-EXT_APPS_PATH = os.path.join(ROOT_PATH, 'xds_server_apps')
+EXT_APPS_PATH = os.path.join(ROOT_PATH, 'apps')
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
 add_path(EXT_APPS_PATH)
@@ -23,11 +23,11 @@ add_path(EXT_APPS_PATH)
 #   undefined - represents submodules which will be ignored on dynamic import
 INSTALLED_APPS = [
     {
-        'module': 'internal_apps.main_interface',
+        'module': 'apps.main_interface',
         'undefined': ['models', 'admin']
     },
     {
-        'module': 'internal_apps.server_context',
+        'module': 'apps.server_context',
         'undefined': ['urls']
     },
     {
