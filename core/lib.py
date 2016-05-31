@@ -1,25 +1,28 @@
 from functools import partial
 from importlib import import_module
+from importlib.util import find_spec
 import logging
+
 from flask.ext.admin.contrib.sqla import ModelView
 from server import settings
 
 
-def try_import(module_name: str):
+def try_import(module_name: str, ignore_not_found: bool = True):
     """
     Function that imports the module and suppresses any import errors.
     :param module_name: the name of the module to be imported
+    :param ignore_not_found: if True, missing modules won't be reported.
     """
 
     try:
         return import_module(module_name)
     except ImportError as e:
+        # skip error message if module existence is optional
+        if ignore_not_found and not find_spec(module_name):
+            return None
 
-        msg = ('Error importing module "%s".\n'
-               'The module might have errors or was not specified as "undefined" in the settings file.\n'
-               'Exception message: %s')
-        logging.warning(msg % (module_name, e.msg))
-        return None
+        msg = 'Error importing module "{}". The module might have errors.\nException message: {}'
+        logging.warning(msg.format(module_name, e.msg))
 
 
 def import_submodule_from_apps(installed_apps: list, submodule_name: str):
@@ -30,24 +33,7 @@ def import_submodule_from_apps(installed_apps: list, submodule_name: str):
     """
 
     for iapp in installed_apps:
-        if submodule_name not in iapp.get('undefined', []):
-            try_import('%s.%s' % (iapp['module'], submodule_name))
-
-
-def import_admin_views():
-    """
-    Import admin submodules.
-    """
-
-    import_submodule_from_apps(installed_apps=settings.INSTALLED_APPS, submodule_name='admin')
-
-
-def import_models():
-    """
-    Import models submodules.
-    """
-
-    import_submodule_from_apps(installed_apps=settings.INSTALLED_APPS, submodule_name='models')
+        try_import('{}.{}'.format(iapp['module'], submodule_name))
 
 
 def create_admin_view(model, model_view=None):
@@ -74,7 +60,7 @@ def apply_prefix(s, prefix):
     :return: a string with this format: "prefix__string"
     """
 
-    return '%s__%s' % (prefix, s)
+    return '{}__{}'.format(prefix, s)
 
 
 def get_custom_prefixer(prefix):
@@ -87,4 +73,10 @@ def get_custom_prefixer(prefix):
     return partial(apply_prefix, prefix=prefix)
 
 
+import_admin_views = partial(import_submodule_from_apps,
+                             installed_apps=settings.INSTALLED_APPS,
+                             submodule_name='admin')
 
+import_models = partial(import_submodule_from_apps,
+                        installed_apps=settings.INSTALLED_APPS,
+                        submodule_name='models')

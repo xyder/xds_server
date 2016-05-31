@@ -20,15 +20,12 @@ add_path(EXT_APPS_PATH)
 # possible keys:
 #   module - (mandatory) represents the module used to fetch the routes and build the blueprint
 #   prefix - represents the optional prefix that can be used for the routes
-#   undefined - represents submodules which will be ignored on dynamic import
 INSTALLED_APPS = [
     {
         'module': 'apps.main_interface',
-        'undefined': ['models', 'admin']
     },
     {
         'module': 'apps.server_context',
-        'undefined': ['urls']
     },
     {
         'module': 'xds_bookmarks',

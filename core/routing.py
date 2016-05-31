@@ -1,6 +1,8 @@
 from functools import partial
 from importlib import import_module
 import itertools
+from importlib.util import find_spec
+
 from flask import Blueprint
 
 from core.lib import try_import
@@ -91,6 +93,10 @@ def build_blueprint(data: dict = ()) -> Blueprint:
     :return: a Flask Blueprint object
     """
 
+    urls_module = try_import('%s.urls' % data['module'])
+    if not urls_module:
+        return None
+
     module_name = data['module'].split('.')[-1]
 
     bp = Blueprint(module_name,
@@ -98,10 +104,6 @@ def build_blueprint(data: dict = ()) -> Blueprint:
                    template_folder='templates',
                    static_folder='static',
                    static_url_path='/static')
-
-    urls_module = try_import('%s.urls' % data['module'])
-    if not urls_module:
-        return bp
 
     # try registering sockets
     add_routes(bp, routes=getattr(urls_module, 'urlpatterns', []))
@@ -120,8 +122,8 @@ def register_blueprints(app, installed_apps):
     """
 
     for iapp in installed_apps:
-        # skip if urls are specified as ignored
-        if 'urls' in iapp.get('undefined', []):
+        bp = build_blueprint(iapp)
+        if not bp:
             continue
 
-        app.register_blueprint(build_blueprint(iapp), url_prefix=iapp.get('prefix', ''))
+        app.register_blueprint(bp, url_prefix=iapp.get('prefix', ''))
