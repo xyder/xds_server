@@ -25,15 +25,14 @@ def try_import(module_name: str, ignore_not_found: bool = True):
         logging.warning(msg.format(module_name, e.msg))
 
 
-def import_submodule_from_apps(installed_apps: list, submodule_name: str):
+def import_sub_module_from_apps(sub_module_name: str):
     """
-    Imports a submodule for all objects in the given apps dict.
-    :param installed_apps: a list containing all apps from which the submodule will be imported
-    :param submodule_name: the name of the submodule to be imported
+    Imports a sub-module for all objects in the INSTALLED_APPS list.
+    :param sub_module_name: the name of the sub-module to be imported
     """
 
-    for iapp in installed_apps:
-        try_import('{}.{}'.format(iapp['module'], submodule_name))
+    for i_app in settings.INSTALLED_APPS:
+        try_import('{}.{}'.format(i_app, sub_module_name))
 
 
 def create_admin_view(model, model_view=None):
@@ -73,10 +72,5 @@ def get_custom_prefixer(prefix):
     return partial(apply_prefix, prefix=prefix)
 
 
-import_admin_views = partial(import_submodule_from_apps,
-                             installed_apps=settings.INSTALLED_APPS,
-                             submodule_name='admin')
-
-import_models = partial(import_submodule_from_apps,
-                        installed_apps=settings.INSTALLED_APPS,
-                        submodule_name='models')
+import_admin_views = partial(import_sub_module_from_apps, sub_module_name='admin')
+import_models = partial(import_sub_module_from_apps, sub_module_name='models')

@@ -38,6 +38,6 @@ def initialize():
     Initializes the application.
     """
 
-    register_blueprints(app, settings.INSTALLED_APPS)
+    register_blueprints(app)
     init_db()
     import_admin_views()

@@ -17,24 +17,11 @@ STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
 add_path(EXT_APPS_PATH)
 
-# possible keys:
-#   module - (mandatory) represents the module used to fetch the routes and build the blueprint
-#   prefix - represents the optional prefix that can be used for the routes
 INSTALLED_APPS = [
-    {
-        'module': 'apps.main_interface',
-    },
-    {
-        'module': 'apps.server_context',
-    },
-    {
-        'module': 'xds_bookmarks',
-        'prefix': '/bookmarks'
-    },
-    {
-        'module': 'xds_notes',
-        'prefix': '/notes'
-    }
+    'apps.main_interface',
+    'apps.server_context',
+    'xds_bookmarks',
+    'xds_notes'
 ]
 
 APP_NAME = 'XDS Server'
