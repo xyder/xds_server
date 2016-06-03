@@ -24,7 +24,7 @@ def update_rule_dict(rule_dict: dict, initial_path: str, module_name: str = ''):
     return result
 
 
-def url(path: str, **kwargs):
+def url(path: str = '', **kwargs):
     """
     Returns a list of rule dictionaries.
     :param path: the path which will be used to create the rule
